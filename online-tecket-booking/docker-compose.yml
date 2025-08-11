@@ -1,0 +1,111 @@
+services:
+  # Databases and Message Broker
+  mongodb:
+    image: mongo:6
+    container_name: event-booking-mongodb
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - event-booking-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: event-booking-rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password123
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - event-booking-network
+
+  # Microservices
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - '3001:3001'
+    environment:
+      - DB_URI=mongodb://admin:password123@mongodb:27017/auth-db?authSource=admin
+      - JWT_SECRET=your-super-secret-jwt-key-here
+      - JWT_EXPIRES_IN=7d
+      - PORT=3001
+    depends_on:
+      - mongodb
+    networks:
+      - event-booking-network
+    restart: unless-stopped
+
+  event-service:
+    build:
+      context: ./services/event-service
+      dockerfile: Dockerfile
+    container_name: event-service
+    ports:
+      - '3002:3002'
+    environment:
+      - DB_URI=mongodb://admin:password123@mongodb:27017/event-db?authSource=admin
+      - JWT_SECRET=your-super-secret-jwt-key-here
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - PORT=3002
+    depends_on:
+      - mongodb
+      - auth-service
+    networks:
+      - event-booking-network
+    restart: unless-stopped
+
+  booking-service:
+    build:
+      context: ./services/booking-service
+      dockerfile: Dockerfile
+    container_name: booking-service
+    ports:
+      - '3003:3003'
+    environment:
+      - DB_URI=mongodb://admin:password123@mongodb:27017/booking-db?authSource=admin
+      - JWT_SECRET=your-super-secret-jwt-key-here
+      - EVENT_SERVICE_URL=http://event-service:3002
+      - RABBITMQ_URI=amqp://admin:password123@rabbitmq:5672
+      - PORT=3003
+    depends_on:
+      - mongodb
+      - rabbitmq
+      - event-service
+    networks:
+      - event-booking-network
+    restart: unless-stopped
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    environment:
+      - SENDGRID_API_KEY=your-sendgrid-api-key-here
+      - FROM_EMAIL=noreply@yourdomain.com
+      - RABBITMQ_URI=amqp://admin:password123@rabbitmq:5672
+      - PORT=3004
+    depends_on:
+      - rabbitmq
+    networks:
+      - event-booking-network
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+  rabbitmq_data:
+
+networks:
+  event-booking-network:
+    driver: bridge
