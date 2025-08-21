@@ -14,11 +14,11 @@ export default function AdminPage() {
   const queryClient = useQueryClient();
   const [showCreateForm, setShowCreateForm] = useState(false);
 
-  const {
-    data: events,
-    isLoading,
-    error,
-  } = useQuery<Event[]>("admin-events", apiClient.getEvents);
+const {
+  data: events,
+  isLoading,
+  error,
+} = useQuery<Event[]>(["admin-events"], () => apiClient.getEvents());
 
   const {
     register,
@@ -36,9 +36,7 @@ export default function AdminPage() {
         reset();
         setShowCreateForm(false);
       },
-      onError: (error: any) => {
-        toast.error(error.response?.data?.message || "Failed to create event");
-      },
+      // Remove onError here, handle in onSubmit for more control
     }
   );
 
@@ -56,7 +54,24 @@ export default function AdminPage() {
   );
 
   const onSubmit = (data: CreateEventRequest) => {
-    createEventMutation.mutate(data);
+    if (!user || user.role !== "admin") {
+      toast.error("You must be an admin to create events.");
+      return;
+    }
+    // Ensure totalSeats is a number
+    const eventData = {
+      ...data,
+      totalSeats: Number(data.totalSeats),
+    };
+    createEventMutation.mutate(eventData, {
+      onError: (error: any) => {
+        if (error?.response?.status === 401 || error?.response?.status === 403) {
+          toast.error("Session expired or unauthorized. Please log in again.");
+        } else {
+          toast.error(error?.response?.data?.message || "Failed to create event");
+        }
+      },
+    });
   };
 
   const handleDeleteEvent = (eventId: string, eventTitle: string) => {
@@ -97,8 +112,13 @@ export default function AdminPage() {
     );
   }
 
+  // Debug: log error if present
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error loading events:', error);
+  }
   return (
-    <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
