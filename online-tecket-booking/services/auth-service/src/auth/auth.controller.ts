@@ -5,6 +5,7 @@ import {
   Get,
   UseGuards,
   Request,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
@@ -36,6 +37,19 @@ export class AuthController {
     return {
       valid: true,
       user: req.user,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('validate-admin')
+  async validateAdmin(@Request() req) {
+    const user = req.user;
+    if (user.role !== 'admin') {
+      throw new UnauthorizedException('User is not an admin');
+    }
+    return {
+      valid: true,
+      user: user,
     };
   }
 }

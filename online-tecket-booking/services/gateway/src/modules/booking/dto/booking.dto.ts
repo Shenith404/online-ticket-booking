@@ -4,7 +4,7 @@ export class CreateBookingDto {
   @IsString()
   eventId: string;
 
-  @IsNumber({}, { message: 'Seats must be a valid number' })
-  @Min(1, { message: 'Seats must be at least 1' })
+  @IsNumber()
+  @Min(1)
   seats: number;
 }

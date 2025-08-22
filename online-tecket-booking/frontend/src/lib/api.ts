@@ -8,28 +8,33 @@ class ApiClient {
   private bookingClient: AxiosInstance;
 
   constructor() {
+    const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005/api';
+
     // Auth Service Client
     this.authClient = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_AUTH_SERVICE_URL,
+      baseURL: baseURL,
       headers: {
         "Content-Type": "application/json",
       },
+      withCredentials: true,
     });
 
     // Event Service Client
     this.eventClient = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_EVENT_SERVICE_URL,
+      baseURL: baseURL,
       headers: {
         "Content-Type": "application/json",
       },
+      withCredentials: true,
     });
 
     // Booking Service Client
     this.bookingClient = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_BOOKING_SERVICE_URL,
+      baseURL: baseURL,
       headers: {
         "Content-Type": "application/json",
       },
+      withCredentials: true,
     });
 
     // Add request interceptors to include auth token
@@ -122,7 +127,7 @@ class ApiClient {
     }
   }
 
-  // Event Service Methods
+    // Event Service Methods
   async getEvents() {
     const response = await this.eventClient.get("/events");
     return response.data;
@@ -141,9 +146,7 @@ class ApiClient {
   async updateEvent(id: string, eventData: any) {
     const response = await this.eventClient.patch(`/events/${id}`, eventData);
     return response.data;
-  }
-
-  async deleteEvent(id: string) {
+  }  async deleteEvent(id: string) {
     const response = await this.eventClient.delete(`/events/${id}`);
     return response.data;
   }
@@ -158,27 +161,16 @@ class ApiClient {
   // Booking Service Methods
   async createBooking(eventId: string, seats: number) {
     try {
-      // Ensure seats is a number
-      const numSeats = Number(seats);
-      if (isNaN(numSeats) || numSeats < 1) {
-        throw new Error('Invalid number of seats');
-      }
-
       const token = Cookies.get("access_token");
       if (!token) {
         throw new Error("No authentication token found");
       }
 
+      // Convert seats to number directly without parseInt
       const response = await this.bookingClient.post("/bookings", 
         {
           eventId,
-          seats: numSeats,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
+          seats: Number(seats)
         }
       );
       return response.data;

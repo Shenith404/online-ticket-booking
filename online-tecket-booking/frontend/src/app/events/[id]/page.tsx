@@ -38,13 +38,33 @@ export default function EventDetailPage() {
     defaultValues: {
       seats: 1,
     },
+    mode: "onChange",
+    resolver: (values) => {
+      const errors: Record<string, { type: string; message: string }> = {};
+      const seats = Number(values.seats);
+      if (isNaN(seats)) {
+        errors.seats = {
+          type: 'validate',
+          message: 'Please enter a valid number'
+        };
+      } else if (seats < 1) {
+        errors.seats = {
+          type: 'min',
+          message: 'Minimum 1 seat required'
+        };
+      }
+      return {
+        values,
+        errors,
+      };
+    },
   });
 
   const watchSeats = watch("seats");
 
   const bookingMutation = useMutation(
     (data: { eventId: string; seats: number }) =>
-      apiClient.createBooking(data.eventId, data.seats),
+      apiClient.createBooking(data.eventId, Number(data.seats)),
     {
       onSuccess: () => {
         toast.success("Booking created successfully!");
@@ -81,20 +101,10 @@ export default function EventDetailPage() {
       return;
     }
     
-    // Convert seats to number and validate
-    const numSeats = Number(data.seats);
-    if (isNaN(numSeats) || numSeats < 1) {
-      toast.error("Please enter a valid number of seats");
-      return;
-    }
+    const seats = Number(data.seats);
     
-    // Validate seats one more time before submitting
-    if (numSeats > event.availableSeats) {
-      toast.error(`Only ${event.availableSeats} seats available`);
-      return;
-    }
-    
-    bookingMutation.mutate({ eventId, seats: numSeats });
+    // Submit the booking
+    bookingMutation.mutate({ eventId, seats });
   };
 
   if (isLoading) {
@@ -286,6 +296,12 @@ export default function EventDetailPage() {
                         min: {
                           value: 1,
                           message: "Minimum 1 seat required",
+                        },
+                        valueAsNumber: true,
+                        validate: (value) => {
+                          if (isNaN(value)) return "Please enter a valid number";
+                          if (value > event.availableSeats) return `Only ${event.availableSeats} seats available`;
+                          return true;
                         },
                         max: {
                           value: event.availableSeats,

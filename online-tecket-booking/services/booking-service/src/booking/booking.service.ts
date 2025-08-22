@@ -23,12 +23,17 @@ export class BookingService {
     authToken: string,
   ): Promise<Booking> {
     const { eventId } = createBookingDto;
-    // Ensure seats is a number
-    const seats = Number(createBookingDto.seats);
-    
-    // Validate seats
-    if (isNaN(seats) || seats < 1) {
-      throw new BadRequestException('Invalid number of seats');
+    let seats: number;
+    try {
+      seats = Number(createBookingDto.seats);
+      if (isNaN(seats)) {
+        throw new BadRequestException('Seats must be a valid number');
+      }
+      if (seats < 1) {
+        throw new BadRequestException('Seats must be at least 1');
+      }
+    } catch (error) {
+      throw new BadRequestException(`Invalid seats value: ${error.message}`);
     }
 
     // Check seat availability with Event Service
