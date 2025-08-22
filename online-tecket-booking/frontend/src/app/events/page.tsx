@@ -15,7 +15,7 @@ export default function EventsPage() {
     data: events,
     isLoading,
     error,
-  } = useQuery<Event[]>("events", apiClient.getEvents);
+  } = useQuery<Event[]>(["events"], () => apiClient.getEvents());
 
   const filteredEvents =
     events?.filter(
