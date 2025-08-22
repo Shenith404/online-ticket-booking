@@ -37,8 +37,17 @@ class ApiClient {
       (client) => {
         client.interceptors.request.use(
           (config) => {
-            const token = Cookies.get("access_token");
-            if (token) {
+            // Don't check token for login and register endpoints
+            const isAuthEndpoint = config.url?.includes('/auth/login') || 
+                                 config.url?.includes('/auth/register');
+            
+            if (!isAuthEndpoint) {
+              const token = Cookies.get("access_token");
+              if (!token) {
+                // Clear user data if token is missing
+                Cookies.remove("user");
+                return Promise.reject(new Error("No auth token"));
+              }
               config.headers.Authorization = `Bearer ${token}`;
             }
             return config;
@@ -50,11 +59,22 @@ class ApiClient {
         client.interceptors.response.use(
           (response) => response,
           (error: AxiosError) => {
-            if (error.response?.status === 401) {
+            // Don't redirect for login/register endpoints
+            const isAuthEndpoint = error.config?.url?.includes('/auth/login') || 
+                                 error.config?.url?.includes('/auth/register');
+
+            if (error.response?.status === 401 && !isAuthEndpoint) {
+              // Clear auth state
               Cookies.remove("access_token");
               Cookies.remove("user");
-              window.location.href = "/auth/login";
+              
+              // Show error message
               toast.error("Session expired. Please login again.");
+              
+              // Delay redirect slightly to ensure toast is visible
+              setTimeout(() => {
+                window.location.href = "/auth/login";
+              }, 100);
             }
             return Promise.reject(error);
           }
@@ -87,8 +107,19 @@ class ApiClient {
   }
 
   async validateToken() {
-    const response = await this.authClient.get("/auth/validate");
-    return response.data;
+    try {
+      const token = Cookies.get("access_token");
+      if (!token) {
+        throw new Error("No token found");
+      }
+      const response = await this.authClient.get("/auth/validate");
+      return response.data;
+    } catch (error) {
+      // If token validation fails, clear auth state
+      Cookies.remove("access_token");
+      Cookies.remove("user");
+      throw error;
+    }
   }
 
   // Event Service Methods
@@ -126,16 +157,54 @@ class ApiClient {
 
   // Booking Service Methods
   async createBooking(eventId: string, seats: number) {
-    const response = await this.bookingClient.post("/bookings", {
-      eventId,
-      seats,
-    });
-    return response.data;
+    try {
+      // Ensure seats is a number
+      const numSeats = Number(seats);
+      if (isNaN(numSeats) || numSeats < 1) {
+        throw new Error('Invalid number of seats');
+      }
+
+      const token = Cookies.get("access_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await this.bookingClient.post("/bookings", 
+        {
+          eventId,
+          seats: numSeats,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error("Error creating booking:", error?.response?.data || error);
+      throw error;
+    }
   }
 
   async getMyBookings() {
-    const response = await this.bookingClient.get("/bookings");
-    return response.data;
+    try {
+      const token = Cookies.get("access_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await this.bookingClient.get("/bookings", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error("Error fetching bookings:", error?.response?.data || error);
+      throw error;
+    }
   }
 
   async getBooking(id: string) {

@@ -26,9 +26,12 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await login(data.email, data.password);
-      router.push("/");
+      // Small delay to ensure state is updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+      router.replace("/"); // Using replace to prevent back navigation to login
     } catch (error) {
       // Error is handled by the auth context
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }

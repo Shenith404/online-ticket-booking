@@ -27,10 +27,12 @@ export default function EventDetailPage() {
     error,
   } = useQuery<Event>(["event", eventId], () => apiClient.getEvent(eventId));
 
+
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<BookingFormData>({
     defaultValues: {
@@ -46,17 +48,53 @@ export default function EventDetailPage() {
     {
       onSuccess: () => {
         toast.success("Booking created successfully!");
+        // Refresh both event and bookings data
         queryClient.invalidateQueries(["event", eventId]);
+        queryClient.invalidateQueries("bookings");
         router.push("/bookings");
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || "Booking failed");
+        if (error?.response?.status === 401 || error?.response?.status === 403) {
+          toast.error("Session expired. Please login again.");
+          router.push("/auth/login");
+        } else if (error?.response?.status === 400) {
+          toast.error(error.response.data.message || "Invalid booking request");
+        } else if (error?.response?.status === 404) {
+          toast.error("Event not found or no longer available");
+        } else {
+          toast.error("Failed to create booking. Please try again.");
+          console.error("Booking error:", error);
+        }
       },
     }
   );
 
   const onSubmit = (data: BookingFormData) => {
-    bookingMutation.mutate({ eventId, seats: data.seats });
+    if (!user) {
+      toast.error("Please login to book tickets");
+      router.push("/auth/login");
+      return;
+    }
+
+    if (!event) {
+      toast.error("Event not found");
+      return;
+    }
+    
+    // Convert seats to number and validate
+    const numSeats = Number(data.seats);
+    if (isNaN(numSeats) || numSeats < 1) {
+      toast.error("Please enter a valid number of seats");
+      return;
+    }
+    
+    // Validate seats one more time before submitting
+    if (numSeats > event.availableSeats) {
+      toast.error(`Only ${event.availableSeats} seats available`);
+      return;
+    }
+    
+    bookingMutation.mutate({ eventId, seats: numSeats });
   };
 
   if (isLoading) {

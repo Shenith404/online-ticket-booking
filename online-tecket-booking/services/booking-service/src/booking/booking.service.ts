@@ -20,22 +20,40 @@ export class BookingService {
   async create(
     createBookingDto: CreateBookingDto,
     userId: string,
+    authToken: string,
   ): Promise<Booking> {
-    const { eventId, seats } = createBookingDto;
+    const { eventId } = createBookingDto;
+    // Ensure seats is a number
+    const seats = Number(createBookingDto.seats);
+    
+    // Validate seats
+    if (isNaN(seats) || seats < 1) {
+      throw new BadRequestException('Invalid number of seats');
+    }
 
     // Check seat availability with Event Service
     try {
+      console.log('Checking seat availability for event:', eventId);
+      const eventServiceUrl = process.env.EVENT_SERVICE_URL || 'http://localhost:3002';
+      const availabilityUrl = `${eventServiceUrl}/events/${eventId}/available-seats`;
+      
       const eventResponse = await firstValueFrom(
-        this.httpService.get(
-          `${process.env.EVENT_SERVICE_URL}/events/${eventId}/available-seats`,
-        ),
+        this.httpService.get(availabilityUrl, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+        }),
       );
 
       const availableSeats = eventResponse.data;
+      console.log('Available seats:', availableSeats);
+      
       if (availableSeats < seats) {
-        throw new BadRequestException('Not enough available seats');
+        throw new BadRequestException(`Not enough available seats. Only ${availableSeats} seats left.`);
       }
     } catch (error) {
+      console.error('Error checking seat availability:', error?.response?.data || error?.message || error);
       if (error.response?.status === 404) {
         throw new BadRequestException('Event not found');
       }
@@ -43,26 +61,42 @@ export class BookingService {
     }
 
     // Process payment
-    const paymentResult = await this.paymentService.processPayment({
-      amount: seats * 50, // $50 per seat
-      currency: 'USD',
-      userId,
-      eventId,
-    });
+    try {
+      console.log('Processing payment for seats:', seats);
+      const paymentResult = await this.paymentService.processPayment({
+        amount: seats * 50, // $50 per seat
+        currency: 'USD',
+        userId,
+        eventId,
+      });
 
-    if (!paymentResult.success) {
-      throw new BadRequestException('Payment failed');
+      if (!paymentResult.success) {
+        throw new BadRequestException(`Payment failed: ${paymentResult.message}`);
+      }
+      console.log('Payment successful:', paymentResult.transactionId);
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      throw new BadRequestException('Payment failed: ' + (error.message || 'Unknown error'));
     }
 
     // Reduce available seats in Event Service
     try {
+      // Use the auth token passed from the controller
       await firstValueFrom(
         this.httpService.patch(
           `${process.env.EVENT_SERVICE_URL}/events/${eventId}/reduce-seats/${seats}`,
+          {},  // empty body
+          {
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
         ),
       );
-    } catch {
-      throw new BadRequestException('Unable to reserve seats');
+    } catch (error) {
+      console.error('Error reducing seats:', error?.response?.data || error?.message || error);
+      throw new BadRequestException(error?.response?.data?.message || 'Unable to reserve seats');
     }
 
     // Create booking
@@ -88,7 +122,15 @@ export class BookingService {
   }
 
   async findByUser(userId: string): Promise<Booking[]> {
-    return this.bookingModel.find({ userId }).exec();
+    try {
+      console.log('Finding bookings for user:', userId);
+      const bookings = await this.bookingModel.find({ userId }).exec();
+      console.log('Found bookings:', bookings.length);
+      return bookings;
+    } catch (error) {
+      console.error('Error finding bookings:', error);
+      throw error;
+    }
   }
 
   async findOne(id: string): Promise<Booking> {

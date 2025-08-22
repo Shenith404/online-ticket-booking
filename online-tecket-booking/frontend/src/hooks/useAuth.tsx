@@ -68,11 +68,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await apiClient.login(email, password);
       const { access_token, user: userData } = response;
 
-      Cookies.set("access_token", access_token, { expires: 7 });
-      Cookies.set("user", JSON.stringify(userData), { expires: 7 });
+      // Set cookie options for better security and persistence
+      const cookieOptions = {
+        expires: 7, // 7 days
+        secure: process.env.NODE_ENV === 'production', // Use secure in production
+        sameSite: 'strict' as const,
+        path: '/'
+      };
+
+      // Store tokens and user data
+      Cookies.set("access_token", access_token, cookieOptions);
+      Cookies.set("user", JSON.stringify(userData), cookieOptions);
+      
+      // Update user state
       setUser(userData);
+      
+      // Validate stored data
+      const storedToken = Cookies.get("access_token");
+      const storedUser = Cookies.get("user");
+      
+      if (!storedToken || !storedUser) {
+        throw new Error("Failed to store authentication data");
+      }
+
       toast.success("Login successful!");
     } catch (error: any) {
+      // Clear any partial data on error
+      Cookies.remove("access_token");
+      Cookies.remove("user");
+      setUser(null);
+      
+      console.error('Login error:', error);
       toast.error(error.response?.data?.message || "Login failed");
       throw error;
     }

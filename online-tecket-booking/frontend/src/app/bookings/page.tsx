@@ -14,8 +14,12 @@ export default function BookingsPage() {
     data: bookings,
     isLoading,
     error,
-  } = useQuery<Booking[]>("my-bookings", apiClient.getMyBookings, {
+  } = useQuery<Booking[]>("my-bookings", () => apiClient.getMyBookings(), {
     enabled: !!user,
+    retry: 1,
+    onError: (error: any) => {
+      console.error("Bookings fetch error:", error?.response?.data || error);
+    }
   });
 
   if (!user) {

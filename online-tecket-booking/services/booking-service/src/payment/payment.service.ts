@@ -18,8 +18,8 @@ export class PaymentService {
   async processPayment(
     _paymentRequest: PaymentRequest,
   ): Promise<PaymentResponse> {
-    // Mock payment gateway - 80% success rate
-    const isSuccess = Math.random() < 0.8;
+    // Mock payment gateway - always succeed for testing
+    const isSuccess = true;
 
     // Simulate processing delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
