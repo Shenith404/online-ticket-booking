@@ -52,7 +52,7 @@ RUN chown -R nestjs:nodejs /app
 USER nestjs
 
 # Expose the port your NestJS application listens on
-EXPOSE 3004
+EXPOSE 3005
 
 
 
