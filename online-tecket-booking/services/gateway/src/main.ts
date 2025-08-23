@@ -22,5 +22,6 @@ async function bootstrap() {
   const port = process.env.PORT || 3005;
   await app.listen(port);
   console.log(`Gateway is running on port ${port}`);
+  console.log(`RabbitMQ is running on ${process.env.RABBITMQ_URI}`);
 }
 bootstrap();
