@@ -11,7 +11,7 @@ import { PaymentModule } from "./payment/payment.module";
       isGlobal: true,
     }),
     MongooseModule.forRoot(
-      process.env.DB_URI || "mongodb://localhost:27017/booking"
+      process.env.BOOKING_DB_URI || "mongodb://localhost:27017/booking"
     ),
     BookingModule,
     AuthModule,

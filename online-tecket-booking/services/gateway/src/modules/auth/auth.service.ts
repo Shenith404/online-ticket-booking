@@ -15,7 +15,7 @@ export class AuthService {
       console.log('Attempting login with:', data);
       const response = await firstValueFrom(
         this.httpService.post(
-          `${this.configService.get('AUTH_SERVICE_URL')}/auth/login`,
+          `${this.configService.get('GATEWAY_AUTH_SERVICE_URL')}/auth/login`,
           data,
         ),
       );
@@ -31,13 +31,16 @@ export class AuthService {
       console.log('Attempting registration with:', data);
       const response = await firstValueFrom(
         this.httpService.post(
-          `${this.configService.get('AUTH_SERVICE_URL')}/auth/register`,
+          `${this.configService.get('GATEWAY_AUTH_SERVICE_URL')}/auth/register`,
           data,
         ),
       );
       return response.data;
     } catch (error) {
-      console.error('Registration error:', error.response?.data || error.message);
+      console.error(
+        'Registration error:',
+        error.response?.data || error.message,
+      );
       throw error;
     }
   }
@@ -46,7 +49,7 @@ export class AuthService {
     try {
       const response = await firstValueFrom(
         this.httpService.get(
-          `${this.configService.get('AUTH_SERVICE_URL')}/auth/validate`,
+          `${this.configService.get('GATEWAY_AUTH_SERVICE_URL')}/auth/validate`,
           {
             headers: { Authorization: token },
           },
@@ -62,7 +65,7 @@ export class AuthService {
     try {
       const response = await firstValueFrom(
         this.httpService.get(
-          `${this.configService.get('AUTH_SERVICE_URL')}/auth/validate-admin`,
+          `${this.configService.get('GATEWAY_AUTH_SERVICE_URL')}/auth/validate-admin`,
           {
             headers: { Authorization: token },
           },
@@ -70,7 +73,10 @@ export class AuthService {
       );
       return response.data;
     } catch (error) {
-      console.error('Admin validation error:', error.response?.data || error.message);
+      console.error(
+        'Admin validation error:',
+        error.response?.data || error.message,
+      );
       return false;
     }
   }
@@ -79,7 +85,7 @@ export class AuthService {
     try {
       const response = await firstValueFrom(
         this.httpService.get(
-          `${this.configService.get('AUTH_SERVICE_URL')}/auth/profile`,
+          `${this.configService.get('GATEWAY_AUTH_SERVICE_URL')}/auth/profile`,
           {
             headers: { Authorization: token },
           },

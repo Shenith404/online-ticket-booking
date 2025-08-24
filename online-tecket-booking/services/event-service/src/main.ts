@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
-import { AppModule } from './app.module';
+import { NestFactory } from "@nestjs/core";
+import { ValidationPipe } from "@nestjs/common";
+import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,12 +10,12 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
-    }),
+    })
   );
 
   app.enableCors();
 
-  const port = process.env.PORT || 3002;
+  const port = process.env.EVENT_PORT || 3002;
   await app.listen(port);
   console.log(`Event Service is running on port ${port}`);
 }

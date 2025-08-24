@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { EventModule } from './event/event.module';
-import { AuthModule } from './auth/auth.module';
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { MongooseModule } from "@nestjs/mongoose";
+import { EventModule } from "./event/event.module";
+import { AuthModule } from "./auth/auth.module";
 
 @Module({
   imports: [
@@ -10,7 +10,7 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
     }),
     MongooseModule.forRoot(
-      process.env.DB_URI || 'mongodb://localhost:27017/event-service',
+      process.env.EVENT_DB_URI || "mongodb://localhost:27017/event-service"
     ),
     EventModule,
     AuthModule,

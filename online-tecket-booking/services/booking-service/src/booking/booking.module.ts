@@ -18,7 +18,7 @@ import { PaymentModule } from "../payment/payment.module";
         transport: Transport.RMQ,
         options: {
           urls: [
-            process.env.RABBITMQ_URI ||
+            process.env.BOOKING_RABBITMQ_URI ||
               "amqp://admin:password123@localhost:5672",
           ],
           queue: "booking_queue",

@@ -19,9 +19,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   // Start the HTTP server
-  const port = process.env.PORT || 3005;
+  const port = process.env.GATEWAY_PORT || 3005;
   await app.listen(port);
   console.log(`Gateway is running on port ${port}`);
-  console.log(`RabbitMQ is running on ${process.env.RABBITMQ_URI}`);
+  console.log(`RabbitMQ is running on ${process.env.GATEWAY_RABBITMQ_URI}`);
 }
 bootstrap();

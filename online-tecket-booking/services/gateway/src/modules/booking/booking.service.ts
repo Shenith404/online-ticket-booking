@@ -14,7 +14,7 @@ export class BookingService {
     try {
       const response = await firstValueFrom(
         this.httpService.post(
-          `${this.configService.get('BOOKING_SERVICE_URL')}/bookings`,
+          `${this.configService.get('GATEWAY_BOOKING_SERVICE_URL')}/bookings`,
           data,
           {
             headers: { Authorization: token },
@@ -31,7 +31,7 @@ export class BookingService {
     try {
       const response = await firstValueFrom(
         this.httpService.get(
-          `${this.configService.get('BOOKING_SERVICE_URL')}/bookings`,
+          `${this.configService.get('GATEWAY_BOOKING_SERVICE_URL')}/bookings`,
           {
             headers: { Authorization: token },
           },
@@ -47,7 +47,7 @@ export class BookingService {
     try {
       const response = await firstValueFrom(
         this.httpService.get(
-          `${this.configService.get('BOOKING_SERVICE_URL')}/bookings/${id}`,
+          `${this.configService.get('GATEWAY_BOOKING_SERVICE_URL')}/bookings/${id}`,
           {
             headers: { Authorization: token },
           },

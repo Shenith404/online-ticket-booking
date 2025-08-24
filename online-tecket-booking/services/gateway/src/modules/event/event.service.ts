@@ -12,7 +12,9 @@ export class EventService {
 
   async getAllEvents() {
     const response = await firstValueFrom(
-      this.httpService.get(`${this.configService.get('EVENT_SERVICE_URL')}/events`),
+      this.httpService.get(
+        `${this.configService.get('GATEWAY_EVENT_SERVICE_URL')}/events`,
+      ),
     );
     return response.data;
   }
@@ -20,7 +22,7 @@ export class EventService {
   async getEvent(id: string) {
     const response = await firstValueFrom(
       this.httpService.get(
-        `${this.configService.get('EVENT_SERVICE_URL')}/events/${id}`,
+        `${this.configService.get('GATEWAY_EVENT_SERVICE_URL')}/events/${id}`,
       ),
     );
     return response.data;
@@ -29,7 +31,7 @@ export class EventService {
   async createEvent(data: any, token: string) {
     const response = await firstValueFrom(
       this.httpService.post(
-        `${this.configService.get('EVENT_SERVICE_URL')}/events`,
+        `${this.configService.get('GATEWAY_EVENT_SERVICE_URL')}/events`,
         data,
         {
           headers: { Authorization: token },
@@ -42,7 +44,7 @@ export class EventService {
   async updateEvent(id: string, data: any, token: string) {
     const response = await firstValueFrom(
       this.httpService.patch(
-        `${this.configService.get('EVENT_SERVICE_URL')}/events/${id}`,
+        `${this.configService.get('GATEWAY_EVENT_SERVICE_URL')}/events/${id}`,
         data,
         {
           headers: { Authorization: token },
@@ -55,7 +57,7 @@ export class EventService {
   async deleteEvent(id: string, token: string) {
     const response = await firstValueFrom(
       this.httpService.delete(
-        `${this.configService.get('EVENT_SERVICE_URL')}/events/${id}`,
+        `${this.configService.get('GATEWAY_EVENT_SERVICE_URL')}/events/${id}`,
         {
           headers: { Authorization: token },
         },
@@ -67,7 +69,7 @@ export class EventService {
   async getAvailableSeats(id: string) {
     const response = await firstValueFrom(
       this.httpService.get(
-        `${this.configService.get('EVENT_SERVICE_URL')}/events/${id}/available-seats`,
+        `${this.configService.get('GATEWAY_EVENT_SERVICE_URL')}/events/${id}/available-seats`,
       ),
     );
     return response.data;

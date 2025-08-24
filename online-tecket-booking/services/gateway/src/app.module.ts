@@ -15,7 +15,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'AUTH_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: [process.env.RABBITMQ_URI || 'amqp://rabbitmq:5672'],
+          urls: [process.env.GATEWAY_RABBITMQ_URI || 'amqp://rabbitmq:5672'],
           queue: 'auth_queue',
           queueOptions: { durable: false },
         },
@@ -24,7 +24,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'BOOKING_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: [process.env.RABBITMQ_URI || 'amqp://rabbitmq:5672'],
+          urls: [process.env.GATEWAY_RABBITMQ_URI || 'amqp://rabbitmq:5672'],
           queue: 'booking_queue',
           queueOptions: { durable: false },
         },
@@ -33,7 +33,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'EVENT_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: [process.env.RABBITMQ_URI || 'amqp://rabbitmq:5672'],
+          urls: [process.env.GATEWAY_RABBITMQ_URI || 'amqp://rabbitmq:5672'],
           queue: 'event_queue',
           queueOptions: { durable: false },
         },
@@ -42,7 +42,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         name: 'NOTIFICATION_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: [process.env.RABBITMQ_URI || 'amqp://rabbitmq:5672'],
+          urls: [process.env.GATEWAY_RABBITMQ_URI || 'amqp://rabbitmq:5672'],
           queue: 'notification_queue',
           queueOptions: { durable: false },
         },
