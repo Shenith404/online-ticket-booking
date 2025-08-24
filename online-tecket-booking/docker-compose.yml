@@ -1,0 +1,119 @@
+services:
+  # Microservices
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: ticket-booking-auth-service
+    restart: unless-stopped
+    env_file:
+      - ./services/auth-service/.env.docker
+    ports:
+      - "3001:3001"
+
+    networks:
+      - ticket-booking-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  event-service:
+    build:
+      context: ./services/event-service
+      dockerfile: Dockerfile
+    container_name: ticket-booking-event-service
+    restart: unless-stopped
+    env_file:
+      - ./services/event-service/.env.docker
+    ports:
+      - "3002:3002"
+    depends_on:
+      - auth-service
+    networks:
+      - ticket-booking-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3002/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  booking-service:
+    build:
+      context: ./services/booking-service
+      dockerfile: Dockerfile
+    container_name: ticket-booking-booking-service
+    restart: unless-stopped
+    env_file:
+      - ./services/booking-service/.env.docker
+
+    ports:
+      - "3003:3003"
+    depends_on:
+      - auth-service
+      - event-service
+    networks:
+      - ticket-booking-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3003/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: ticket-booking-notification-service
+    restart: unless-stopped
+    env_file:
+      - ./services/notification-service/.env.docker
+    networks:
+      - ticket-booking-network
+
+  gateway:
+    build:
+      context: ./services/gateway
+      dockerfile: dockerfile
+    container_name: ticket-booking-gateway
+    restart: unless-stopped
+    env_file:
+      - ./services/gateway/.env.docker
+    ports:
+      - "3005:3005"
+    depends_on:
+      - auth-service
+      - event-service
+      - booking-service
+      - notification-service
+    networks:
+      - ticket-booking-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3005/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ticket-booking-frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:3005/api
+      - NEXTAUTH_SECRET=your-nextauth-secret-change-in-production
+      - NEXTAUTH_URL=http://localhost:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - gateway
+    networks:
+      - ticket-booking-network
+
+networks:
+  ticket-booking-network:
+    driver: bridge
