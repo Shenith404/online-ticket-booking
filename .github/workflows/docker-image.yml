@@ -30,8 +30,8 @@ jobs:
       - name: Build and push ${{ matrix.service }}
         uses: docker/build-push-action@v5
         with:
-          context: ./services/${{ matrix.service }}
-          file: ./services/${{ matrix.service }}/Dockerfile
+          context: ./online-tecket-booking/services/${{ matrix.service }}
+          file: ./online-tecket-booking/services/${{ matrix.service }}/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest
