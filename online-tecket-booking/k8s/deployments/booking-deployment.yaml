@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-deployment
+  namespace: ticket-booking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking
+  template:
+    metadata:
+      labels:
+        app: booking
+    spec:
+      containers:
+        - name: booking
+          image: shenithbandara/booking-service:latest
+          ports:
+            - containerPort: 3003
+          envFrom:
+            - configMapRef:
+                name: booking-config

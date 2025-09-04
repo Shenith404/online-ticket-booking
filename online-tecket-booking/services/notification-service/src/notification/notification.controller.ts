@@ -11,7 +11,7 @@ export class NotificationController {
 
   @EventPattern('booking.confirmed')
   async handleBookingConfirmed(@Payload() data: BookingConfirmedData) {
-    console.log('📧 Received booking confirmation event:', data);
+    console.log(' Received booking confirmation event:', data);
     await this.notificationService.sendBookingConfirmationEmail(data);
   }
 }

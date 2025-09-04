@@ -12,7 +12,25 @@ jobs:
     environment: env.production
     strategy:
       matrix:
-        service: [auth-service, booking-service, event-service, gateway, notification-service]
+        include:
+          - service: auth-service
+            context: ./online-tecket-booking/services/auth-service
+            dockerfile: ./online-tecket-booking/services/auth-service/Dockerfile
+          - service: booking-service
+            context: ./online-tecket-booking/services/booking-service
+            dockerfile: ./online-tecket-booking/services/booking-service/Dockerfile
+          - service: event-service
+            context: ./online-tecket-booking/services/event-service
+            dockerfile: ./online-tecket-booking/services/event-service/Dockerfile
+          - service: gateway
+            context: ./online-tecket-booking/services/gateway
+            dockerfile: ./online-tecket-booking/services/gateway/dockerfile
+          - service: notification-service
+            context: ./online-tecket-booking/services/notification-service
+            dockerfile: ./online-tecket-booking/services/notification-service/Dockerfile
+          - service: frontend
+            context: ./online-tecket-booking/frontend
+            dockerfile: ./online-tecket-booking/frontend/Dockerfile
 
     steps:
       # 1. Checkout repo
@@ -30,8 +48,8 @@ jobs:
       - name: Build and push ${{ matrix.service }}
         uses: docker/build-push-action@v5
         with:
-          context: ./online-tecket-booking/services/${{ matrix.service }}
-          file: ./online-tecket-booking/services/${{ matrix.service }}/Dockerfile
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service }}:latest

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+  namespace: ticket-booking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: shenithbandara/auth-service:latest
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - configMapRef:
+                name: auth-config

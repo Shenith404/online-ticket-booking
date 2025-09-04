@@ -1,27 +1,45 @@
-# compiled output
-/dist
+# Dependencies
 node_modules/
-/build
-
-
-# Logs
-logs
-*.log
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# Compiled output
+/dist
+/build
+dist/
+build/
+*.tsbuildinfo
+
+# Next.js specific
+.next/
+out/
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# NestJS specific
+services/*/dist/
+services/*/build/
+
+# Logs
+logs
+*.log
+
 # OS
 .DS_Store
+Thumbs.db
 
 # Tests
 /coverage
 /.nyc_output
+coverage/
 
 # IDEs and editors
 /.idea
+.idea/
 .project
 .classpath
 .c9/
@@ -36,17 +54,28 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# dotenv environment variable files
+# Environment variables
 .env
 .env.development.local
 .env.test.local
 .env.production.local
 .env.local
 .env.docker
+.env.development
+.env.staging
+.env.production
+services/*/.env
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
-# temp directory
+# Temporary directories
 .temp
 .tmp
+temp/
+tmp/
 
 # Runtime data
 pids
@@ -67,24 +96,56 @@ docker-compose.dev.yml
 *.sqlite
 *.sqlite3
 
-# NestJS specific
-dist/
+# Package manager lock files (optional - keep one, ignore others if needed)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Cache directories
+.npm
+.yarn
+.cache/
+.parcel-cache/
+
+# TypeScript cache
 *.tsbuildinfo
 
-# Package manager lock files (keep one, ignore others)
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+# Optional REPL history
+.node_repl_history
 
-# Local development
-.env.local
-.env.development
-.env.staging
-.env.production
+# Output of 'npm pack'
+*.tgz
 
-# Microservices specific
-services/*/dist/
-services/*/.env
+# Yarn Integrity file
+.yarn-integrity
 
-# IDE
-.vscode/settings.json
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Dependency directories
+jspm_packages/
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# ESLint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional stylelint cache
+.stylelintcache
+
+# SvelteKit build / generate output
+.svelte-kit
+
+# Turbo
+.turbo
+# k8s
+k8s/configmaps/*.yaml
+k8s/secrets/*.yaml

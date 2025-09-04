@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-deployment
+  namespace: ticket-booking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification
+  template:
+    metadata:
+      labels:
+        app: notification
+    spec:
+      containers:
+        - name: notification
+          image: shenithbandara/notification-service:latest
+          ports:
+            - containerPort: 3004
+          envFrom:
+            - configMapRef:
+                name: notification-config

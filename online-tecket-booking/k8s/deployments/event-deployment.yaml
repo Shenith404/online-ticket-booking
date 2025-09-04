@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-deployment
+  namespace: ticket-booking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event
+  template:
+    metadata:
+      labels:
+        app: event
+    spec:
+      containers:
+      - name: event
+        image: shenithbandara/event-service:latest
+        ports:
+        - containerPort: 3002
+        envFrom:
+        - configMapRef:
+            name: event-config
