@@ -2,7 +2,7 @@
 
 A complete event ticket booking platform built with microservices architecture. Users can browse events, book tickets, and receive notifications, while administrators can manage events and track bookings in real-time.
 
-## 🎯 Features
+##  Features
 
 ### User Features
 
