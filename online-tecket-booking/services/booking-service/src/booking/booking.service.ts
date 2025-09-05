@@ -75,7 +75,7 @@ export class BookingService {
     try {
       console.log("Processing payment for seats:", seats);
       const paymentResult = await this.paymentService.processPayment({
-        amount: seats * 50, // $50 per seat
+        amount: seats * 50, 
         currency: "USD",
         userId,
         eventId,
@@ -100,7 +100,7 @@ export class BookingService {
       await firstValueFrom(
         this.httpService.patch(
           `${process.env.BOOKING_EVENT_SERVICE_URL}/events/${eventId}/reduce-seats/${seats}`,
-          {}, // empty body
+          {}, 
           {
             headers: {
               Authorization: `Bearer ${authToken}`,

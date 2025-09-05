@@ -26,45 +26,8 @@ A complete event ticket booking platform built with microservices architecture. 
 - **Container Support**: Full Docker and Kubernetes deployment
 - **API Documentation**: Auto-generated Swagger documentation
 
-## Architecture Overview
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   API Gateway   │    │  Microservices  │
-│   (Next.js)     │◄──►│   (NestJS)      │◄──►│   (NestJS)      │
-│   Port: 3000    │    │   Port: 3005    │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                              │
-                      ┌───────────────────────┼───────────────────────┐
-                      │                       │                       │
-           ┌──────────▼──────────┐   ┌───────▼────────┐   ┌──────────▼──────────┐
-           │   Auth Service      │   │   Event Service │   │  Booking Service    │
-           │   Port: 3001        │   │   Port: 3002    │   │   Port: 3003        │
-           │   - JWT Auth        │   │   - Event CRUD  │   │   - Create Bookings │
-           │   - User Management │   │   - Seat Mgmt   │   │   - Payment Process │
-           └─────────────────────┘   └─────────────────┘   └─────────────────────┘
-                                              │
-                                    ┌─────────▼─────────┐
-                                    │ Notification Svc  │
-                                    │   Port: 3004      │
-                                    │   - Email Alerts  │
-                                    │   - RabbitMQ      │
-                                    └───────────────────┘
-                                              │
-                    ┌─────────────────────────┼─────────────────────────┐
-                    │         Infrastructure              │
-            ┌───────▼────────┐  ┌──────────▼───────────┐ │
-            │    MongoDB     │  │      RabbitMQ        │ │
-            │   Port: 27017  │  │     Port: 5672       │ │
-            │   - User Data  │  │   - Message Queue    │ │
-            │   - Events     │  │   - Event Publishing │ │
-            │   - Bookings   │  │   - Email Triggers   │ │
-            └────────────────┘  └──────────────────────┘ │
-                                                         │
-                              ┌──────────────────────────▼──┐
-                              │    Docker & Kubernetes     │
-                              └─────────────────────────────┘
-```
+
 
 ## Technology Stack
 
@@ -365,20 +328,23 @@ NOTIFICATION_FROM_EMAIL=noreply@yourdomain.com
 
 - Swagger docs: http://localhost:3003/api
 
-## 🧪 Testing
+## Testing
 
 ### Manual Testing Workflow
 
 1. **User Registration**
+
    - Visit http://localhost:3000/auth/register
    - Create user account with email/password
    - Verify JWT token generation and storage
 
 2. **Admin Account Setup**
+
    - Register with role: 'admin'
    - Access admin-only features at /admin
 
 3. **Event Management**
+
    - Create events (admin only)
    - Browse events (public access)
    - Check real-time seat availability
@@ -401,7 +367,7 @@ cd services/gateway && npm run test
 cd frontend && npm run test
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -454,7 +420,7 @@ minikube stop && minikube start
 minikube addons enable ingress
 ```
 
-## 🔄 Development Workflow
+## Development Workflow
 
 ### Adding New Features
 
@@ -473,16 +439,18 @@ minikube addons enable ingress
 - **Logging**: Structured logging for debugging
 - **Validation**: Input validation using class-validator
 
-## 🚢 Production Deployment
+## Production Deployment
 
 ### Environment Preparation
 
 1. **Configure Production Secrets**
+
    - Use Kubernetes Secrets for sensitive data
    - Set up production MongoDB cluster
    - Configure production Mailtrap account
 
 2. **Update Image Registry**
+
    - Build and push images to production registry
    - Update Kubernetes manifests with production image tags
 
@@ -539,19 +507,6 @@ For questions, issues, or support:
 - **GitHub Issues**: [Create an issue](https://github.com/Shenith404/online-ticket-booking/issues)
 - **Documentation**: Check this README and service-specific documentation
 - **Email**: Contact the maintainer for urgent issues
-
-## Future Enhancements
-
-- [ ] Real payment gateway integration (Stripe/PayPal)
-- [ ] Advanced event search and filtering
-- [ ] Mobile app development (React Native)
-- [ ] Real-time seat booking with WebSockets
-- [ ] Analytics dashboard for admins
-- [ ] Multi-language support
-- [ ] Social media integration
-- [ ] Event recommendation system
-- [ ] PDF ticket generation
-- [ ] Advanced monitoring and alerting
 
 ## Prerequisites
 
