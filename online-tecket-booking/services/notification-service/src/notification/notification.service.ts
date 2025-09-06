@@ -21,7 +21,7 @@ export class NotificationService {
       port: 2525,
       auth: {
         user: process.env.NOTIFICATION_MAILTRAP_USER || "49d631490fd62f",
-        pass: process.env.NOTIFICATION_MAILTRAP_PASS || "****6171",
+        pass: process.env.NOTIFICATION_MAILTRAP_PASS || "",
       },
     });
   }
