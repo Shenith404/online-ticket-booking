@@ -147,5 +147,5 @@ coverage/
 # Turbo
 .turbo
 # k8s
-k8s/configmaps/*.yaml
+k8s/configmaps/*-config.yaml
 k8s/secrets/*.yaml

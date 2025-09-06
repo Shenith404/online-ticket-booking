@@ -1,0 +1,14 @@
+# Example Kubernetes ConfigMap for environment variables
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-config
+  namespace: ticket-booking
+data:
+  # Database connection string
+  DB_URI: "<your-database-uri>"
+
+  # JWT secret for authentication
+  JWT_SECRET: "<your-jwt-secret>"
+
+  
